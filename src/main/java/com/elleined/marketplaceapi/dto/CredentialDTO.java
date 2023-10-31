@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CredentialDTO {
 
-    @NotBlank(message = "Email cannot be blank, null, or empty")
+    @NotBlank(message = "Please provide a value for the email")
     @Email(message = "Enter a valid email")
     private String email;
 
-    @NotBlank(message = "Password cannot be blank, null, or empty")
+    @NotBlank(message = "Please provide a value for the password")
     private String password;
 
     private String confirmPassword;

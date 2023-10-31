@@ -35,7 +35,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public DeliveryAddress saveDeliveryAddress(User orderingUser, DeliveryAddressDTO deliveryAddressDTO) throws DeliveryAddressLimitException {
-        if (orderingUser.hasReachedDeliveryAddressLimit()) throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you already reached the limit which is 5");
+        if (orderingUser.hasReachedDeliveryAddressLimit())
+            throw new DeliveryAddressLimitException("Cannot save another delivery address! Because you have reached the maximum limit of " + DELIVERY_ADDRESS_LIMIT + " delivery addresses. To add a new address, you must first remove one of your existing addresses.");
         DeliveryAddress deliveryAddress = addressMapper.toDeliveryAddressEntity(deliveryAddressDTO, orderingUser);
         orderingUser.getDeliveryAddresses().add(deliveryAddress);
         addressRepository.save(deliveryAddress);

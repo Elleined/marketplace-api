@@ -17,7 +17,6 @@ public interface ATMService {
 
     DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, MultipartFile proofOfTransaction)
             throws NotValidAmountException,
-            MinimumAmountException,
             DepositLimitException,
             MalformedProofOfTransaction, IOException;
 

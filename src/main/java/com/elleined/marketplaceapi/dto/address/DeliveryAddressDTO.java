@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class DeliveryAddressDTO extends AddressDTO {
 
-    @NotBlank(message = "title cannot be null, blank, or empty!")
+    @NotBlank(message = "Please provide a value for the title!")
     private String title;
 
     @Builder(builderMethodName = "deliveryAddressBuilder")

@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getById(int id) throws ResourceNotFoundException {
-        return transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + id + " does't exists!"));
+        return transactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + id + " doesn't exists!"));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public DepositTransaction getDepositTransactionById(int depositTransactionId) throws ResourceNotFoundException {
-        return depositTransactionRepository.findById(depositTransactionId).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + depositTransactionId + " does't exists!"));
+        return depositTransactionRepository.findById(depositTransactionId).orElseThrow(() -> new ResourceNotFoundException("Transaction with id of " + depositTransactionId + " doesn't exists!"));
     }
 
     @Override

@@ -47,10 +47,17 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     private String cropTradeImgDirectory;
 
     @Override
-    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, MultipartFile picture, String message) throws NotValidBodyException, MessageAgreementNotAcceptedException, IOException {
-        if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
-        if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED) throw new MessageAgreementNotAcceptedException("Cannot send private message! because you don't accept our chat agreement!");
-        if (StringUtil.isNotValid(message)) throw new NotValidBodyException("Please provide your message");
+    public PrivateChatMessage save(PrivateChatRoom privateChatRoom, User currentUser, Product productToSettle, MultipartFile picture, String message)
+            throws NotValidBodyException,
+            MessageAgreementNotAcceptedException,
+            IOException {
+
+        if (privateChatRoom.getSender().equals(currentUser) && privateChatRoom.getIsSenderAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED)
+            throw new MessageAgreementNotAcceptedException("You cannot send a private message because you have not accepted our chat agreement!");
+        if (privateChatRoom.getReceiver().equals(currentUser) && privateChatRoom.getIsReceiverAcceptedAgreement() == ChatRoom.Status.NOT_ACCEPTED)
+            throw new MessageAgreementNotAcceptedException("You cannot send a private message because you have not accepted our chat agreement!");
+        if (StringUtil.isNotValid(message))
+            throw new NotValidBodyException("Please provide a valid message for your private chat!");
 
         String pictureImage = Validator.validMultipartFile(picture) ? picture.getOriginalFilename() : null;
         PrivateChatMessage privateChatMessage = chatMessageMapper.toPrivateChatMessageEntity(privateChatRoom, currentUser, pictureImage, message);
@@ -68,9 +75,14 @@ public class PrivateMessageService implements PrivateChatRoomService, PrivateCha
     }
 
     @Override
-    public void unsentMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage) throws NotOwnedException, ResourceNotFoundException {
-        if (!sender.getPrivateChatMessages().contains(privateChatMessage)) throw new NotOwnedException("Cannot delete message! because you don't own these message!");
-        if (!privateChatRoom.getPrivateChatMessages().contains(privateChatMessage)) throw new ResourceNotFoundException("Cannot delete message! because this private chat room doesn't have this private message!");
+    public void unsentMessage(User sender, PrivateChatRoom privateChatRoom, PrivateChatMessage privateChatMessage)
+            throws NotOwnedException,
+            ResourceNotFoundException {
+
+        if (!sender.getPrivateChatMessages().contains(privateChatMessage))
+            throw new NotOwnedException("You cannot delete this message because you are not the owner of this private chat message!");
+        if (!privateChatRoom.getPrivateChatMessages().contains(privateChatMessage))
+            throw new ResourceNotFoundException("You cannot delete this message because it does not exist within this private chat room!");
 
         privateChatMessage.setStatus(ChatMessage.Status.INACTIVE);
         privateChatMessageRepository.save(privateChatMessage);

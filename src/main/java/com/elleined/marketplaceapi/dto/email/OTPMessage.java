@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Setter
 public class OTPMessage extends Message {
 
-    @Positive(message = "Email plusExpirationSeconds cannot be less than 0 or equal to 0!")
+    @Positive(message = "Email plusExpirationSeconds must be greater than 0!")
     private int plusExpirationSeconds;
     
     private LocalTime expirationTime;

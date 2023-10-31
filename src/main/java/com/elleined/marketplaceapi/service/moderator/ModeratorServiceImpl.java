@@ -16,7 +16,7 @@ import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.ModeratorRepository;
 import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
-import com.elleined.marketplaceapi.service.atm.machine.ATMValidator;
+import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.service.image.ImageUploader;
 import com.elleined.marketplaceapi.service.moderator.request.DepositRequest;
 import com.elleined.marketplaceapi.service.moderator.request.ProductRequest;
@@ -79,12 +79,14 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     @Override
     public ModeratorDTO login(CredentialDTO moderatorCredentialDTO) throws ResourceNotFoundException, InvalidUserCredentialException {
         String email = moderatorCredentialDTO.getEmail();
-        if (!moderatorRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!moderatorRepository.fetchAllEmail().contains(email))
+            throw new InvalidUserCredentialException("You have provided an invalid username or password. Please check your credentials and try again!");
         Moderator moderator = moderatorRepository.fetchByEmail(moderatorCredentialDTO.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Moderator does not exists!"));
 
         String rawPassword = moderatorCredentialDTO.getPassword();
         String encodedPassword = moderator.getModeratorCredential().getPassword();
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!passwordEncoder.matches(rawPassword, encodedPassword))
+            throw new InvalidUserCredentialException("You have provided an invalid username or password. Please check your credentials and try again!");
         log.debug("Moderator with id of {} are now logged in", moderator.getId());
         return moderatorMapper.toDTO(moderator);
     }
@@ -103,11 +105,11 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
             UserAlreadyVerifiedException {
 
         if (userToBeVerified.isVerified())
-            throw new UserAlreadyVerifiedException("This user is already been verified");
+            throw new UserAlreadyVerifiedException("This user has already been verified.");
         if (!userToBeVerified.hasShopRegistration())
-            throw new NoShopRegistrationException("This user doesn't have pending shop registration! must send a shop registration first!");
+            throw new NoShopRegistrationException("This user does not have a pending shop registration. Please wait until user submits shop registration request first!");
         if (userToBeVerified.hasShopRegistration() && userToBeVerified.isRejected())
-            throw new UserVerificationRejectionException("You're verification are been rejected by moderator try re-sending you're valid id and check email for reason why you're verification application are rejected.");
+            throw new UserVerificationRejectionException("Your verification application has been rejected by a moderator. Please resubmit your valid ID and check your email for the reason behind the rejection.");
         // Add validation here
 
         userVerificationRequest.accept(moderator, userToBeVerified);
@@ -120,7 +122,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public void rejectUser(Moderator moderator, User userToBeRejected) throws UserAlreadyVerifiedException {
-        if (userToBeRejected.isVerified()) throw new UserAlreadyVerifiedException("Rejection failed! because this user verification request are already been verified!");
+        if (userToBeRejected.isVerified())
+            throw new UserAlreadyVerifiedException("The rejection cannot be processed because this user's verification request has already been verified!");
         // Add validation here
         userVerificationRequest.reject(moderator, userToBeRejected);
     }
@@ -151,7 +154,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public void rejectProduct(Moderator moderator, Product productToBeRejected) throws ProductAlreadyListedException {
-        if (productToBeRejected.isListed()) throw new ProductAlreadyListedException("Rejection failed! because this product already been listed");
+        if (productToBeRejected.isListed())
+            throw new ProductAlreadyListedException("The rejection cannot be processed because this product has already been listed!");
         // Add validation here
         productRequest.reject(moderator, productToBeRejected);
     }
@@ -168,9 +172,14 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
     }
 
     @Override
-    public void release(Moderator moderator, DepositTransaction depositTransaction) throws TransactionReleaseException, TransactionRejectedException {
-        if (depositTransaction.isRelease()) throw new TransactionReleaseException("Cannot release deposit! because this transaction is already been released!");
-        if (depositTransaction.isRejected()) throw new TransactionRejectedException("Cannot release deposit! because this transaction is already been rejected");
+    public void release(Moderator moderator, DepositTransaction depositTransaction)
+            throws TransactionReleaseException,
+            TransactionRejectedException {
+
+        if (depositTransaction.isRelease())
+            throw new TransactionReleaseException("You cannot release this deposit because the transaction has already been released!");
+        if (depositTransaction.isRejected())
+            throw new TransactionRejectedException("You cannot release this deposit because the transaction has already been rejected!");
         // Add validation here
         depositRequest.accept(moderator, depositTransaction);
     }
@@ -183,7 +192,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public void reject(Moderator moderator, DepositTransaction depositTransaction) throws TransactionReleaseException {
-        if (depositTransaction.isRelease()) throw new TransactionReleaseException("Cannot reject deposit! because this transaction is already been released!");
+        if (depositTransaction.isRelease())
+            throw new TransactionReleaseException("You cannot reject this deposit because the transaction has already been released!");
         // Add validation here
         depositRequest.reject(moderator, depositTransaction);
     }
@@ -205,10 +215,15 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
         User requestingUserToWithdraw = withdrawTransaction.getUser();
         BigDecimal amountToBeWithdrawn = withdrawTransaction.getAmount();
-        if (Validator.notValidMultipartFile(proofOfTransaction)) throw new NotValidBodyException("Cannot release withdraw! please provide proof of transaction that you already sent the money to requesting user!.");
-        if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot release withdraw! because this transaction is already been released!");
-        if (withdrawTransaction.isRejected()) throw new TransactionRejectedException("Cannot release withdraw! because this transaction is already been rejected!");
-        if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn)) throw new InsufficientBalanceException("Cannot release withdraw! because this user balance has only balance of " + requestingUserToWithdraw.getBalance() + " is below to requesting amount to be withdrawn which is " + amountToBeWithdrawn + ". Reject it!");
+
+        if (Validator.notValidMultipartFile(proofOfTransaction))
+            throw new NotValidBodyException("You cannot release the withdraw request because you haven't provided proof of the transaction confirming that you've sent the money to the requesting user!");
+        if (withdrawTransaction.isRelease())
+            throw new TransactionReleaseException("You cannot release the withdraw request because this transaction has already been released!");
+        if (withdrawTransaction.isRejected())
+            throw new TransactionRejectedException("You cannot release the withdraw request because this transaction has already been rejected!");
+        if (atmValidator.isBalanceEnough(requestingUserToWithdraw, amountToBeWithdrawn))
+            throw new InsufficientBalanceException("You cannot release the withdraw request because the user's balance is insufficient. The current balance of the user is " + requestingUserToWithdraw.getBalance() + ", which is below the requested amount to be withdrawn, set at " + amountToBeWithdrawn);
         // Add validation here
 
         withdrawTransaction.setProofOfTransaction(proofOfTransaction.getOriginalFilename());
@@ -226,7 +241,8 @@ public class ModeratorServiceImpl implements ModeratorService, EntityPasswordEnc
 
     @Override
     public void reject(Moderator moderator, WithdrawTransaction withdrawTransaction) throws TransactionReleaseException {
-        if (withdrawTransaction.isRelease()) throw new TransactionReleaseException("Cannot reject withdraw request! because this transaction is already been released!");
+        if (withdrawTransaction.isRelease())
+            throw new TransactionReleaseException("You cannot reject this withdraw request because the transaction has already been released!");
         // Add validation here
         withdrawRequest.reject(moderator, withdrawTransaction);
     }

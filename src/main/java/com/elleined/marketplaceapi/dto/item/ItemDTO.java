@@ -17,7 +17,7 @@ public abstract class ItemDTO {
 
     private Long id;
 
-    @Positive(message = "Order quantity cannot be 0 or less than zero!")
+    @Positive(message = "Order quantity must be greater than zero!")
     private int orderQuantity;
 
     private double price;
@@ -27,11 +27,11 @@ public abstract class ItemDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime orderDate;
 
-    @Positive(message = "Product id cannot be 0 or less than zero!")
+    @Positive(message = "Product id must be greater than zero!")
     private int productId;
 
     private int purchaserId; // This will be get in path variable
 
-    @Positive(message = "Delivery address id cannot be 0 or less than zero!")
+    @Positive(message = "Delivery address id must be greater than zero!")
     private int deliveryAddressId;
 }

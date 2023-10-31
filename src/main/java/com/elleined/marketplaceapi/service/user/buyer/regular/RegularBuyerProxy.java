@@ -54,7 +54,7 @@ public class RegularBuyerProxy implements BuyerService, RegularBuyerRestriction 
             ProductExpiredException {
 
         if (isBuyerExceedsToMaxOrderPerDay(buyer))
-            throw new BuyerMaxOrderPerDayException("Cannot order product! because you already reached the max order per day which is " + MAX_ORDER_PER_DAY + " consider buying premium account to remove this restriction.");
+            throw new BuyerMaxOrderPerDayException("You cannot order this product because you have already reached the maximum number of orders allowed per day, which is set at " + MAX_ORDER_PER_DAY + ". Consider purchasing a premium account to remove this restriction.");
         // Add more validation for regular buyer here for future
         return buyerService.orderProduct(buyer, orderItemDTO);
     }

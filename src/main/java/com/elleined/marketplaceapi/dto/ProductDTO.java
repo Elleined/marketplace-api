@@ -19,37 +19,37 @@ import java.time.LocalDate;
 public class ProductDTO {
     private int id;
 
-    @NotBlank(message = "Crop name cannot be null, blank, or empty")
+    @NotBlank(message = "Please provide a value for the Crop name")
     private String cropName;
 
-    @NotBlank(message = "Unit name cannot be null, blank, or empty")
+    @NotBlank(message = "Please provide a value for the Unit name")
     private String unitName;
 
-    @NotBlank(message = "Description cannot be null, blank, or empty")
+    @NotBlank(message = "Please provide a value for the Description")
     private String description;
 
     private String picture;
 
-    @NotBlank(message = "Keyword cannot be null, blank, or empty")
+    @NotBlank(message = "Please provide a value for the Keyword")
     private String keyword;
     private String state;
 
     private int sellerId;
     private String sellerName;
 
-    @Positive(message = "Available quantity cannot be negative or less than 0")
+    @Positive(message = "Available quantity must be greater than zero")
     private int availableQuantity;
-    @Positive(message = "Price per unit cannot be negative or less than 0")
+    @Positive(message = "Price per unit must be greater than zero")
     private double pricePerUnit;
-    @Positive(message = "Quantity per unit cannot be negative or less than 0")
+    @Positive(message = "Quantity per unit must be greater than zero")
     private int quantityPerUnit;
 
-    @NotNull(message = "Harvest date cannot null")
+    @NotNull(message = "Please provide a value for the harvest date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "Cannot sell an product that are not have been harvested yet")
     private LocalDate harvestDate;
 
-    @NotNull(message = "Expiration date cannot null")
+    @NotNull(message = "Please provide a value for the expiration date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
 
     private LocalDate expirationDate;

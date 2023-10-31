@@ -124,9 +124,13 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
         fullNameValidator.validate(userDTO.getUserDetailsDTO());
         emailValidator.validate(email);
         passwordValidator.validate(password);
-        if (isTwoPasswordNotMatch(password, confirmPassword)) throw new PasswordNotMatchException("Password and confirm password not match!");
-        if (getAllUtilityService.getAllEmail().contains(email)) throw new AlreadyExistException("This email " + email + " is already associated with an account!");
-        if (getAllUtilityService.getAllMobileNumber().contains(mobileNumber)) throw new AlreadyExistException("Mobile number of " + mobileNumber + " are already associated with another account!");
+
+        if (isTwoPasswordNotMatch(password, confirmPassword))
+            throw new PasswordNotMatchException("The password and confirm password do not match.!");
+        if (getAllUtilityService.getAllEmail().contains(email))
+            throw new AlreadyExistException("This email, " + email + ", is already associated with an existing account.");
+        if (getAllUtilityService.getAllMobileNumber().contains(mobileNumber))
+            throw new AlreadyExistException("The mobile number " + mobileNumber + " is already associated with another account.!");
 
         User registeringUser = userMapper.toEntity(userDTO);
         this.encodePassword(registeringUser, registeringUser.getUserCredential().getPassword());
@@ -141,7 +145,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public User saveByDTO(UserDTO dto, MultipartFile profilePicture) throws ResourceNotFoundException, HasDigitException, PasswordNotMatchException, WeakPasswordException, MalformedEmailException, AlreadyExistException, MobileNumberException, IOException {
-        if (Validator.notValidMultipartFile(profilePicture)) throw new ResourceException("Profile picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(profilePicture))
+            throw new ResourceException("The profile picture attachment cannot be null.!");
         dto.getUserDetailsDTO().setPicture(profilePicture.getOriginalFilename());
         User registeringUser = saveByDTO(dto);
         userRepository.save(registeringUser);
@@ -157,16 +162,22 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
                 .email(user.getUserCredential().getEmail())
                 .UUID(user.getReferralCode())
                 .build();
-        forumClient.save(forumUserDTO);
+//        forumClient.save(forumUserDTO);
         log.debug("Saving user with id of {} in forum api success", user.getId());
     }
 
     @Override
     public void resendValidId(User currentUser, MultipartFile validId)
-            throws UserAlreadyVerifiedException, NoShopRegistrationException, IOException {
-        if (Validator.notValidMultipartFile(validId)) throw new ResourceException("Picture attachment cannot be null!");
-        if (currentUser.isVerified()) throw new UserAlreadyVerifiedException("Cannot resend valid id! you are already been verified");
-        if (!currentUser.hasShopRegistration()) throw new NoShopRegistrationException("Cannot resent valid id! you need to submit a shop registration before resending you valid id.");
+            throws UserAlreadyVerifiedException,
+            NoShopRegistrationException,
+            IOException {
+
+        if (Validator.notValidMultipartFile(validId))
+            throw new ResourceException("Valid id picture attachment cannot be null.!");
+        if (currentUser.isVerified())
+            throw new UserAlreadyVerifiedException("You cannot resend your valid ID because you are already verified!");
+        if (!currentUser.hasShopRegistration())
+            throw new NoShopRegistrationException("You cannot resend your valid ID because you need to submit a shop registration before doing so!");
 
         currentUser.getUserVerification().setValidId(validId.getOriginalFilename());
         userRepository.save(currentUser);
@@ -182,11 +193,13 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
             InvalidUserCredentialException {
 
         String email = userCredentialDTO.getEmail();
-        if (!userRepository.fetchAllEmail().contains(email)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!userRepository.fetchAllEmail().contains(email))
+            throw new InvalidUserCredentialException("You have provided an invalid username or password. Please check your credentials and try again!");
 
         User user = getByEmail(userCredentialDTO.getEmail());
         String encodedPassword = user.getUserCredential().getPassword();
-        if (!passwordEncoder.matches(userCredentialDTO.getPassword(), encodedPassword)) throw new InvalidUserCredentialException("You have entered an invalid username or password");
+        if (!passwordEncoder.matches(userCredentialDTO.getPassword(), encodedPassword))
+            throw new InvalidUserCredentialException("You have provided an invalid username or password. Please check your credentials and try again!");
         log.debug("User with email of {} logged in marketplace api", userCredentialDTO.getEmail());
         return user;
     }
@@ -211,13 +224,20 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
 
     @Override
     public void sendShopRegistration(User owner, String shopName, String description, MultipartFile shopPicture, MultipartFile validId) throws AlreadyExistException, IOException {
-        if (Validator.notValidMultipartFile(validId)) throw new ResourceException("Valid id Picture attachment cannot be null!");
-        if (Validator.notValidMultipartFile(shopPicture)) throw new ResourceException("Shop Picture attachment cannot be null!");
-        if (StringUtil.isNotValid(shopName)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop name!");
-        if (StringUtil.isNotValid(description)) throw new NotValidBodyException("Cannot send shop registration! Please provide shop description!");
-        if (owner.isVerified()) throw new AlreadyExistException("Cannot send shop registration! because you are already been verified!");
-        if (owner.hasShopRegistration()) throw new AlreadyExistException("Cannot send shop registration! because you already have shop registration! Please wait for email notification. If don't receive an email consider resending your valid id!");
-        if (isShopNameAlreadyExists(shopName)) throw new AlreadyExistException("Cannot send shop registration! because the shop name you provided " + shopName + " already been taken by another seller!");
+        if (Validator.notValidMultipartFile(validId))
+            throw new ResourceException("The valid ID picture attachment cannot be null!");
+        if (Validator.notValidMultipartFile(shopPicture))
+            throw new ResourceException("The shop picture attachment cannot be null!!");
+        if (StringUtil.isNotValid(shopName))
+            throw new NotValidBodyException("You cannot send the shop registration because you have not provided the shop name!");
+        if (StringUtil.isNotValid(description))
+            throw new NotValidBodyException("You cannot send the shop registration because you have not provided a shop description!");
+        if (owner.isVerified())
+            throw new AlreadyExistException("You cannot send the shop registration because you are already verified!");
+        if (owner.hasShopRegistration())
+            throw new AlreadyExistException("You cannot send the shop registration because you already have a shop registration. Please wait for an email notification. If you don't receive an email, consider resending your valid ID!");
+        if (isShopNameAlreadyExists(shopName))
+            throw new AlreadyExistException("You cannot send the shop registration because the shop name you provided, " + shopName + ", is already taken by another seller!");
 
         Shop shop = Shop.builder()
                 .picture(shopPicture.getOriginalFilename())
@@ -275,7 +295,8 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
             ResourceNotFoundException {
 
         User user = getByEmail(email);
-        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword))
+            throw new PasswordNotMatchException("The new password and the retyped password do not match!");
         passwordValidator.validate(newPassword);
 
         this.encodePassword(user, newPassword);
@@ -286,8 +307,10 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
     @Override
     public void changePassword(User user, String oldPassword, String newPassword, String retypeNewPassword) throws PasswordException {
         String encodedPassword = user.getUserCredential().getPassword();
-        if (!passwordEncoder.matches(oldPassword, encodedPassword)) throw new PasswordNotMatchException("Old password didn't match to your current password!");
-        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword)) throw new PasswordNotMatchException("New and re-type password not match!");
+        if (!passwordEncoder.matches(oldPassword, encodedPassword))
+            throw new PasswordNotMatchException("The old password provided does not match your current password!");
+        if (isTwoPasswordNotMatch(newPassword, retypeNewPassword))
+            throw new PasswordNotMatchException("The new password and the retyped password do not match!");
         passwordValidator.validate(newPassword);
 
         this.encodePassword(user, newPassword);

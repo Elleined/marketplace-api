@@ -26,9 +26,9 @@ public class PremiumService {
             throws InsufficientBalanceException, AlreadyExistException {
 
         if (user.isPremium() && !user.isPremiumSubscriptionExpired())
-            throw new AlreadyExistException("Cannot buy premium! because you already purchased our premium account please wait for your premium account to expired which is " + user.getPremium().getRegistrationDate().plusMonths(1) + " before purchasing again");
+            throw new AlreadyExistException("You cannot purchase a premium account because you already have an active premium subscription. Please wait until your current premium account expires, which is set to expire on " + user.getPremium().getRegistrationDate().plusMonths(1) + ", before making another purchase.");
         if (user.isBalanceNotEnoughForPremium())
-            throw new InsufficientBalanceException("Cannot buy premium because! you doesn't have enough balance to pay for the premium user fee amounting " + FeeService.PREMIUM_USER_FEE);
+            throw new InsufficientBalanceException("You cannot purchase a premium account because your balance is insufficient to cover the premium user fee, which amounts to " + FeeService.PREMIUM_USER_FEE);
         Premium premium = Premium.builder()
                 .registrationDate(LocalDateTime.now())
                 .user(user)

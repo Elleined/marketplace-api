@@ -27,7 +27,7 @@ import java.io.IOException;
 @Transactional
 @Qualifier("premiumSellerProxy")
 public class PremiumSellerProxy implements SellerService {
-    public static final float SUCCESSFUL_TRANSACTION_FEE = 1;
+    public static final float SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE = 1;
     private final SellerService sellerService;
     private final FeeService feeService;
 
@@ -85,7 +85,7 @@ public class PremiumSellerProxy implements SellerService {
         double orderPrice = orderItem.getPrice();
         double successfulTransactionFee = getSuccessfulTransactionFee(orderPrice);
         if (isBalanceNotEnoughToPaySuccessfulTransactionFee(seller, successfulTransactionFee))
-            throw new InsufficientBalanceException("Cannot sold order! because you doesn't have enough balance to pay for the successful transaction fee of " + successfulTransactionFee + " which is the " + SUCCESSFUL_TRANSACTION_FEE + "% of order total price of " + orderPrice);
+            throw new InsufficientBalanceException("You cannot complete the sale of this order because you do not have a sufficient balance to cover the successful transaction fee. The fee amounts to " + successfulTransactionFee + ", which is " + SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE + "% of the order's total price of " + orderPrice);
         feeService.deductSuccessfulTransactionFee(seller, successfulTransactionFee);
 
         sellerService.soldOrder(seller, orderItem);
@@ -98,6 +98,6 @@ public class PremiumSellerProxy implements SellerService {
 
     @Override
     public double getSuccessfulTransactionFee(double orderPrice) {
-        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE / 100f));
+        return (orderPrice * (SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE / 100f));
     }
 }

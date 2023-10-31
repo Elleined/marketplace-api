@@ -35,15 +35,15 @@ public class UserDTO {
     private BigDecimal balance;
 
     @Valid
-    @NotNull(message = "User details cannot be null")
+    @NotNull(message = "Please provide a value for the User details")
     private UserDetailsDTO userDetailsDTO;
 
     @Valid
-    @NotNull(message = "Address cannot be null")
+    @NotNull(message = "Please provide a value for the Address")
     private AddressDTO addressDTO;
 
     @Valid
-    @NotNull(message = "Credentials cannot be null")
+    @NotNull(message = "Please provide a value for the Credentials")
     private CredentialDTO userCredentialDTO;
 
     @Data
@@ -51,30 +51,30 @@ public class UserDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserDetailsDTO {
-        @NotBlank(message = "First name cannot be blank, null, or empty")
+        @NotBlank(message = "Please provide a value for the first name")
         private String firstName;
         private String middleName;
 
-        @NotBlank(message = "Last name cannot be blank, null, or empty")
+        @NotBlank(message = "Please provide a value for the last name")
         private String lastName;
 
         private LocalDateTime registrationDate;
 
-        @NotBlank(message = "Gender cannot be blank, null, or empty")
+        @NotBlank(message = "Please provide a value for the gender")
         private String gender;
 
-        @NotNull(message = "Birthday cannot be blank, null, or empty")
+        @NotNull(message = "Please provide a value for the birthday")
         @Past(message = "Birth Date should be in the past")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private LocalDate birthDate;
 
 
-        @NotBlank(message = "Mobile number cannot be blank, null, or empty")
+        @NotBlank(message = "Please provide a value for the mobile number")
         private String mobileNumber;
 
         private String picture;
 
-        @NotBlank(message = "Suffix id cannot be less than zero. If user has no suffix use NONE")
+        @NotBlank(message = "Suffix id must be greater than zero. If suffix use NONE")
         private String suffix;
     }
 }

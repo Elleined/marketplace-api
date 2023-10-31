@@ -13,6 +13,6 @@ public class PremiumSellerConstantController {
 
     @GetMapping("/transaction-fee")
     public float getTransactionFee() {
-        return PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE;
+        return PremiumSellerProxy.SUCCESSFUL_TRANSACTION_FEE_PERCENTAGE;
     }
 }

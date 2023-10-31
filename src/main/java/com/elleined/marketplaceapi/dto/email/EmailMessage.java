@@ -11,10 +11,10 @@ import lombok.Setter;
 @Setter
 public class EmailMessage extends Message {
 
-    @NotBlank(message = "Email subject cannot be blank, null, or empty!")
+    @NotBlank(message = "Please provide a value for the email subject!")
     private String subject;
 
-    @NotBlank(message = "Email Message cannot be blank, null, or empty!")
+    @NotBlank(message = "Please provide a value for the email message!")
     private String messageBody;
 
     @Builder

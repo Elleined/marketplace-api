@@ -1,4 +1,4 @@
-package com.elleined.marketplaceapi.service.atm.machine;
+package com.elleined.marketplaceapi.service.atm.machine.validator;
 
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
@@ -15,10 +15,6 @@ public class ATMValidator {
 
     public boolean isNotValidAmount(BigDecimal amount) {
         return amount == null || amount.compareTo(BigDecimal.ZERO) <= 0;
-    }
-
-    public boolean isSenderSendingToHimself(User sender, User receiver) {
-        return sender.getId() == receiver.getId();
     }
 
     public boolean isUserTotalPendingRequestAmountAboveBalance(User currentUser) {

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 public class EmailValidator implements Validator<String> {
     @Override
     public void validate(String email) throws MalformedEmailException {
-        if (!email.endsWith("@gmail.com")) throw new MalformedEmailException("Email must ends with @gmail.com!");
-        if (email.startsWith("@")) throw new MalformedEmailException("Email should not starts with @!");
+        if (!email.endsWith("@gmail.com"))
+            throw new MalformedEmailException("Email must ends with @gmail.com!");
+        if (email.startsWith("@"))
+            throw new MalformedEmailException("Email should not starts with @!");
     }
 }

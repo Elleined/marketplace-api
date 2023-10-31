@@ -14,18 +14,18 @@ public class AddressDTO {
 
     private int id;
 
-    @NotBlank(message = "Details cannot be null, empty, or blank")
+    @NotBlank(message = "Please provide a value for the Address details")
     private String details;
 
-    @NotBlank(message = "Region name cannot be null, empty, or blank")
+    @NotBlank(message = "Please provide a value for the Region")
     private String regionName;
 
-    @NotBlank(message = "Province name cannot be null, empty, or blank")
+    @NotBlank(message = "Please provide a value for the Province")
     private String provinceName;
 
-    @NotBlank(message = "City name cannot be null, empty, or blank")
+    @NotBlank(message = "Please provide a value for the City")
     private String cityName;
 
-    @NotBlank(message = "Baranggay name cannot be null, empty, or blank")
+    @NotBlank(message = "Please provide a value for the Baranggay")
     private String baranggayName;
 }

@@ -35,7 +35,7 @@ public class WebATMService implements ATMService {
     private final PeerToPeerService peerToPeerService;
 
     @Override
-    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, MultipartFile proofOfTransaction) throws NotValidAmountException, MalformedProofOfTransaction, DepositLimitException, MinimumAmountException, IOException {
+    public DepositTransaction requestDeposit(User currentUser, BigDecimal depositAmount, MultipartFile proofOfTransaction) throws NotValidAmountException, DepositLimitException, MalformedProofOfTransaction, IOException {
         // Add validation here
         return depositService.requestDeposit(currentUser, depositAmount, proofOfTransaction);
     }
