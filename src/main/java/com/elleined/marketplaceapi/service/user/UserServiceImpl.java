@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService, EntityPasswordEncoder<User>
                 .email(user.getUserCredential().getEmail())
                 .UUID(user.getReferralCode())
                 .build();
-//        forumClient.save(forumUserDTO);
+        forumClient.save(forumUserDTO);
         log.debug("Saving user with id of {} in forum api success", user.getId());
     }
 
