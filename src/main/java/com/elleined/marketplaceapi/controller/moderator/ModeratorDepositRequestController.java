@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.atm.dto.DepositTransactionDTO;
 import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.DepositTransactionService;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class ModeratorDepositRequestController {
     private final ModeratorService moderatorService;
 
-    private final TransactionService transactionService;
+    private final DepositTransactionService depositTransactionService;
     private final TransactionMapper transactionMapper;
 
     private final EmailService emailService;
@@ -37,7 +37,7 @@ public class ModeratorDepositRequestController {
                  @PathVariable("depositTransactionId") int depositTransactionId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        DepositTransaction depositTransaction = transactionService.getDepositTransactionById(depositTransactionId);
+        DepositTransaction depositTransaction = depositTransactionService.getById(depositTransactionId);
         moderatorService.release(moderator, depositTransaction);
         emailService.sendReleaseDepositMail(depositTransaction);
     }
@@ -46,7 +46,7 @@ public class ModeratorDepositRequestController {
                                   @RequestBody Set<Integer> depositTransactionsId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        Set<DepositTransaction> depositTransactions = new HashSet<>(transactionService.getAllDepositTransactionById(depositTransactionsId));
+        Set<DepositTransaction> depositTransactions = new HashSet<>(depositTransactionService.getAll(depositTransactionsId));
         moderatorService.releaseAllDepositRequest(moderator, depositTransactions);
     }
     @PatchMapping("/{depositTransactionId}/reject")
@@ -54,7 +54,7 @@ public class ModeratorDepositRequestController {
                 @PathVariable("depositTransactionId") int depositTransactionId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        DepositTransaction depositTransaction = transactionService.getDepositTransactionById(depositTransactionId);
+        DepositTransaction depositTransaction = depositTransactionService.getById(depositTransactionId);
         moderatorService.reject(moderator, depositTransaction);
         emailService.sendRejectDepositMail(depositTransaction);
     }
@@ -64,7 +64,7 @@ public class ModeratorDepositRequestController {
                                  @RequestBody Set<Integer> depositTransactionsId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        Set<DepositTransaction> depositTransactions = new HashSet<>(transactionService.getAllDepositTransactionById(depositTransactionsId));
+        Set<DepositTransaction> depositTransactions = new HashSet<>(depositTransactionService.getAll(depositTransactionsId));
         moderatorService.rejectAllDepositRequest(moderator, depositTransactions);
     }
 }

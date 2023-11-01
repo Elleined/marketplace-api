@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class DepositTransactionService implements NewTransaction<DepositTransaction> {
+public class DepositTransactionService implements TransactionService<DepositTransaction> {
     private final DepositTransactionRepository depositTransactionRepository;
 
 
@@ -34,7 +35,7 @@ public class DepositTransactionService implements NewTransaction<DepositTransact
     }
 
     @Override
-    public List<DepositTransaction> getAll(List<Integer> ids) {
+    public List<DepositTransaction> getAll(Collection<Integer> ids) {
         return depositTransactionRepository.findAllById(ids);
     }
 

@@ -4,7 +4,7 @@ import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.model.Moderator;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.WithdrawTransactionService;
 import com.elleined.marketplaceapi.service.email.EmailService;
 import com.elleined.marketplaceapi.service.moderator.ModeratorService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class ModeratorWithdrawRequestController {
     private final ModeratorService moderatorService;
 
     private final TransactionMapper transactionMapper;
-    private final TransactionService transactionService;
+    private final WithdrawTransactionService withdrawTransactionService;
 
     private final EmailService emailService;
 
@@ -42,7 +42,7 @@ public class ModeratorWithdrawRequestController {
                                 @RequestPart("proofOfTransaction") MultipartFile proofOfTransaction) throws IOException {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
+        WithdrawTransaction withdrawTransaction = withdrawTransactionService.getById(withdrawTransactionId);
         moderatorService.release(moderator, withdrawTransaction, proofOfTransaction);
         emailService.sendReleaseWithdrawMail(withdrawTransaction);
     }
@@ -52,7 +52,7 @@ public class ModeratorWithdrawRequestController {
                                    @RequestBody Set<Integer> withdrawTransactionIds) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(transactionService.getAllWithdrawTransactions(withdrawTransactionIds));
+        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(withdrawTransactionService.getAll(withdrawTransactionIds));
         moderatorService.releaseAllWithdrawRequest(moderator, withdrawTransactions);
     }
 
@@ -61,7 +61,7 @@ public class ModeratorWithdrawRequestController {
                                @PathVariable("withdrawTransactionId") Integer withdrawTransactionId) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        WithdrawTransaction withdrawTransaction = transactionService.getWithdrawTransactionById(withdrawTransactionId);
+        WithdrawTransaction withdrawTransaction = withdrawTransactionService.getById(withdrawTransactionId);
         moderatorService.reject(moderator, withdrawTransaction);
         emailService.sendRejectedWithdrawMail(withdrawTransaction);
     }
@@ -71,7 +71,7 @@ public class ModeratorWithdrawRequestController {
                                   @RequestBody Set<Integer> withdrawTransactionIds) {
 
         Moderator moderator = moderatorService.getById(moderatorId);
-        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(transactionService.getAllWithdrawTransactions(withdrawTransactionIds));
+        Set<WithdrawTransaction> withdrawTransactions = new HashSet<>(withdrawTransactionService.getAll(withdrawTransactionIds));
         moderatorService.rejectAllWithdrawRequest(moderator, withdrawTransactions);
     }
 }

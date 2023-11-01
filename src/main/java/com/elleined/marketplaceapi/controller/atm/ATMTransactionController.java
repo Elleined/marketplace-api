@@ -5,7 +5,9 @@ import com.elleined.marketplaceapi.dto.atm.dto.PeerToPeerTransactionDTO;
 import com.elleined.marketplaceapi.dto.atm.dto.WithdrawTransactionDTO;
 import com.elleined.marketplaceapi.mapper.TransactionMapper;
 import com.elleined.marketplaceapi.model.user.User;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.DepositTransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.PeerToPeerTransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.WithdrawTransactionService;
 import com.elleined.marketplaceapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +23,15 @@ import java.util.List;
 public class ATMTransactionController {
     private final UserService userService;
 
-    private final TransactionService transactionService;
+    private final WithdrawTransactionService withdrawTransactionService;
+    private final DepositTransactionService depositTransactionService;
+    private final PeerToPeerTransactionService peerToPeerTransactionService;
     private final TransactionMapper transactionMapper;
 
     @GetMapping("/withdraw")
     public List<WithdrawTransactionDTO> getAllWithdrawalTransactions(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
-        return transactionService.getAllWithdrawalTransactions(currentUser).stream()
+        return withdrawTransactionService.getAll(currentUser).stream()
                 .map(transactionMapper::toWithdrawTransactionDTO)
                 .toList();
     }
@@ -35,7 +39,7 @@ public class ATMTransactionController {
     @GetMapping("/deposit")
     public List<DepositTransactionDTO> getAllDepositTransactions(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
-        return transactionService.getAllDepositTransactions(currentUser).stream()
+        return depositTransactionService.getAll(currentUser).stream()
                 .map(transactionMapper::toDepositTransactionDTO)
                 .toList();
     }
@@ -43,7 +47,7 @@ public class ATMTransactionController {
     @GetMapping("/receive-money")
     public List<PeerToPeerTransactionDTO> getAllReceiveMoneyTransactions(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
-        return transactionService.getAllReceiveMoneyTransactions(currentUser).stream()
+        return peerToPeerTransactionService.getAllReceivedTransaction(currentUser).stream()
                 .map(transactionMapper::toPeer2PeerTransactionDTO)
                 .toList();
     }
@@ -51,7 +55,7 @@ public class ATMTransactionController {
     @GetMapping("/sent-money")
     public List<PeerToPeerTransactionDTO> getAllSentMoneyTransactions(@PathVariable("currentUserId") int currentUserId) {
         User currentUser = userService.getById(currentUserId);
-        return transactionService.getAllSentMoneyTransactions(currentUser).stream()
+        return peerToPeerTransactionService.getAllSentTransactions(currentUser).stream()
                 .map(transactionMapper::toPeer2PeerTransactionDTO)
                 .toList();
     }

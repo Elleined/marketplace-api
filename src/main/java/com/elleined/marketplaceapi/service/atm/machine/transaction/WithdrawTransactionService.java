@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class WithdrawTransactionService implements NewTransaction<WithdrawTransaction> {
+public class WithdrawTransactionService implements TransactionService<WithdrawTransaction> {
     private final WithdrawTransactionRepository withdrawTransactionRepository;
 
     @Override
@@ -32,7 +33,7 @@ public class WithdrawTransactionService implements NewTransaction<WithdrawTransa
     }
 
     @Override
-    public List<WithdrawTransaction> getAll(List<Integer> ids) {
+    public List<WithdrawTransaction> getAll(Collection<Integer> ids) {
         return withdrawTransactionRepository.findAllById(ids);
     }
 
