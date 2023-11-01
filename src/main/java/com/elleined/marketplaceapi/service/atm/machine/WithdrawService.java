@@ -11,9 +11,9 @@ import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.atm.transaction.WithdrawTransaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.repository.atm.WithdrawTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.WithdrawTransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
@@ -44,7 +44,7 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
     private final ATMValidator atmValidator;
     private final NumberValidator numberValidator;
 
-    private final WithdrawTransactionRepository withdrawTransactionRepository;
+    private final WithdrawTransactionService withdrawTransactionService;
 
     private final ATMFeeService feeService;
     private final AppWalletService appWalletService;
@@ -81,19 +81,15 @@ public class WithdrawService implements ATMLimitValidator, ATMLimitPerDayValidat
         if (reachedLimitAmountPerDay(user))
             throw new WithdrawLimitPerDayException("Cannot withdraw! Because you have already reached the daily sending limit, which is " + WITHDRAWAL_LIMIT_PER_DAY);
 
-        String trn = UUID.randomUUID().toString();
-
         WithdrawTransaction withdrawTransaction = WithdrawTransaction.builder()
-                .trn(trn)
+                .trn(UUID.randomUUID().toString())
                 .amount(withdrawalAmount)
                 .transactionDate(LocalDateTime.now())
                 .status(Transaction.Status.PENDING)
                 .gcashNumber(gcashNumber)
                 .user(user)
                 .build();
-
-        withdrawTransactionRepository.save(withdrawTransaction);
-        log.debug("Withdraw transaction saved with trn of {}", trn);
+        withdrawTransactionService.save(withdrawTransaction);
         return withdrawTransaction;
     }
 

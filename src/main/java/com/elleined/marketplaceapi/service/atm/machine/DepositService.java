@@ -8,9 +8,9 @@ import com.elleined.marketplaceapi.model.atm.transaction.DepositTransaction;
 import com.elleined.marketplaceapi.model.atm.transaction.Transaction;
 import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
-import com.elleined.marketplaceapi.repository.atm.DepositTransactionRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.DepositTransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
@@ -45,7 +45,7 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
 
     private final ATMValidator atmValidator;
 
-    private final DepositTransactionRepository depositTransactionRepository;
+    private final DepositTransactionService depositTransactionService;
 
     private final ATMFeeService feeService;
 
@@ -79,20 +79,16 @@ public class DepositService implements ATMLimitValidator, ATMLimitPerDayValidato
         if (isAboveMaximum(depositedAmount)) throw new DepositLimitException("Cannot deposit! You cannot make a deposit because the amount you entered exceeds the maximum deposit limit which is " + MAXIMUM_DEPOSIT_AMOUNT);
         if (reachedLimitAmountPerDay(user)) throw new DepositLimitPerDayException("Cannot deposit! You cannot make another deposit today because you've already reached your daily deposit limit " + DEPOSIT_LIMIT_PER_DAY);
 
-        String trn = UUID.randomUUID().toString();
-
         DepositTransaction depositTransaction = DepositTransaction.builder()
-                .trn(trn)
+                .trn(UUID.randomUUID().toString())
                 .amount(depositedAmount)
                 .transactionDate(LocalDateTime.now())
                 .status(Transaction.Status.PENDING)
                 .proofOfTransaction(proofOfTransaction.getOriginalFilename())
                 .user(user)
                 .build();
-
-        depositTransactionRepository.save(depositTransaction);
+        depositTransactionService.save(depositTransaction);
         imageUploader.upload(cropTradeImgDirectory + DirectoryFolders.DEPOSIT_TRANSACTIONS_FOLDER, proofOfTransaction);
-        log.debug("Deposit transaction saved with trn of {}", trn);
         return depositTransaction;
     }
 

@@ -11,7 +11,7 @@ import com.elleined.marketplaceapi.model.user.User;
 import com.elleined.marketplaceapi.repository.UserRepository;
 import com.elleined.marketplaceapi.service.AppWalletService;
 import com.elleined.marketplaceapi.service.atm.fee.ATMFeeService;
-import com.elleined.marketplaceapi.service.atm.machine.transaction.TransactionService;
+import com.elleined.marketplaceapi.service.atm.machine.transaction.PeerToPeerTransactionService;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMLimitPerDayValidator;
 import com.elleined.marketplaceapi.service.atm.machine.validator.ATMValidator;
 import com.elleined.marketplaceapi.utils.TransactionUtils;
@@ -38,7 +38,7 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
     private final UserRepository userRepository;
     private final ATMFeeService feeService;
     private final ATMValidator atmValidator;
-    private final TransactionService transactionService;
+    private final PeerToPeerTransactionService peerToPeerTransactionService;
     private final AppWalletService appWalletService;
 
     public PeerToPeerTransaction peerToPeer(User sender, User receiver, @NonNull BigDecimal sentAmount)
@@ -92,19 +92,15 @@ public class PeerToPeerService implements ATMLimitPerDayValidator {
     }
 
     private PeerToPeerTransaction savePeerToPeerTransaction(User sender, User receiver, BigDecimal sentAmount) {
-        String trn = UUID.randomUUID().toString();
-
         PeerToPeerTransaction peerToPeerTransaction = PeerToPeerTransaction.builder()
-                .trn(trn)
+                .trn(UUID.randomUUID().toString())
                 .amount(sentAmount)
                 .transactionDate(LocalDateTime.now())
                 .status(Transaction.Status.RELEASE)
                 .sender(sender)
                 .receiver(receiver)
                 .build();
-
-        transactionService.save(peerToPeerTransaction);
-        log.debug("Peer to peer transaction saved successfully with trn of {}", trn);
+        peerToPeerTransactionService.save(peerToPeerTransaction);
         return peerToPeerTransaction;
     }
 
